@@ -215,7 +215,7 @@ double AstarPathFinder::getHeu(GridNodePtr node1, GridNodePtr node2)
     switch (htype)
     {
     case Euclidean:
-        h = (node1->index - node2->index).norm();
+        h = (node1->index - node2->index).cast<double>().norm();
         break;
     case Manhattan:
         h = (node1->index - node2->index).lpNorm<1>();
