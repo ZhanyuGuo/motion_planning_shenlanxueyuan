@@ -1,5 +1,22 @@
 clc;clear;close all;
-path = ginput() * 100.0;
+
+axis([0 100 0 100]);
+path = [];
+cnt = 0;
+while true
+    tmp = ginput(1);
+    if size(tmp, 1) == 0
+        break;
+    else
+        cnt = cnt + 1;
+        path(cnt, :) = tmp;
+        scatter(tmp(1), tmp(2));
+        axis([0 100 0 100]);
+        hold on
+    end
+end
+% path = ginput() * 100.0;
+% path = ginput();
 
 n_order = 7; % order of poly
 n_seg = size(path, 1) - 1; % segment number
@@ -32,10 +49,15 @@ poly_coef_x = MinimumSnapQPSolver(path(:, 1), ts, n_seg, n_order);
 poly_coef_y = MinimumSnapQPSolver(path(:, 2), ts, n_seg, n_order);
 
 % display the trajectory
-X_n = [];
-Y_n = [];
-k = 1;
+% X_n = [];
+% Y_n = [];
+
 tstep = 0.01;
+pts = T / tstep + 1;
+X_n = zeros(pts, 1);
+Y_n = zeros(pts, 1);
+k = 1;
+
 for i = 0: n_seg - 1
     % ##########################################################################
     %   STEP 3: get the coefficients of i-th segment of both x-axis and y-axis
@@ -50,6 +72,7 @@ for i = 0: n_seg - 1
 end
 
 plot(X_n, Y_n , 'Color', [0 1.0 0], 'LineWidth', 2);
+axis([0 100 0 100]);
 hold on
 scatter(path(1: size(path, 1), 1), path(1: size(path, 1), 2));
 

@@ -1,15 +1,16 @@
 function Q = getQ(n_seg, n_order, ts)
     Q = [];
-    for k = 1: n_seg
-        Q_k = zeros(n_order + 1, n_order + 1);
+    n_poly_perseg = n_order + 1;
+    for j = 1: n_seg
+        Q_j = zeros(n_poly_perseg, n_poly_perseg);
         % ###############################################
         %   STEP 1.1: calculate Q_k of the k-th segment
         % ###############################################
         for i = 4: n_order
-            for j = 4: n_order
-                Q_k(i + 1, j + 1) = factorial(i)/factorial(i - 4) * factorial(j)/factorial(j - 4) / (i + j - n_order) * ts(k)^(i + j - n_order);
+            for k = 4: n_order
+                Q_j(i + 1, k + 1) = factorial(i)/factorial(i - 4) * factorial(k)/factorial(k - 4) / (i + k - n_order) * ts(j)^(i + k - n_order);
             end
         end
-        Q = blkdiag(Q, Q_k);
+        Q = blkdiag(Q, Q_j);
     end
 end
