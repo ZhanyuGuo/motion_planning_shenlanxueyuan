@@ -1,0 +1,4 @@
+<launch>
+    <node name="rviz" pkg="rviz" type="rviz"
+        args="-d $(find grid_path_searcher)/launch/rviz_config/demo.rviz" required="true" />
+</launch>

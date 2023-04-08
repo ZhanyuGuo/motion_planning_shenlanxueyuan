@@ -1,5 +1,4 @@
 <launch>
-
     <arg name="map_size_x" default="20.0" />
     <arg name="map_size_y" default="20.0" />
     <arg name="map_size_z" default="10.0" />
@@ -46,9 +45,9 @@
         <param name="sensing/rate" value="0.5" />
     </node>
 
-    <node pkg="waypoint_generator" name="waypoint_generator" type="waypoint_generator" output="screen">
+    <node pkg="waypoint_generator" name="waypoint_generator" type="waypoint_generator"
+        output="screen">
         <remap from="~goal" to="/goal" />
         <param name="waypoint_type" value="manual-lonely-waypoint" />
     </node>
-
 </launch>

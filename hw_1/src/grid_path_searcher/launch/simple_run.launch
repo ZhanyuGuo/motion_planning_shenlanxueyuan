@@ -1,0 +1,4 @@
+<launch>
+    <include file="$(find grid_path_searcher)/launch/rviz.launch" />
+    <include file="$(find grid_path_searcher)/launch/demo.launch" />
+</launch>
