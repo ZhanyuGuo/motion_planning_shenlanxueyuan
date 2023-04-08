@@ -1,17 +1,18 @@
 % Used for Motion Planning for Mobile Robots
 % Thanks to HKUST ELEC 5660 
-close all; clear all; clc;
+close all; clear; clc;
+addpath('./A_star');
 
-set(gcf, 'Renderer', 'painters');
+% set(gcf, 'Renderer', 'painters');
 set(gcf, 'Position', [500, 50, 700, 700]);
 
 % Environment map in 2D space
-xStart = 1.0;
-yStart = 1.0;
+xStart  = 1.0;
+yStart  = 1.0;
 xTarget = 10.0;
 yTarget = 10.0;
-MAX_X = 10;
-MAX_Y = 10;
+MAX_X   = 10;
+MAX_Y   = 10;
 map = obstacle_map(xStart, yStart, xTarget, yTarget, MAX_X, MAX_Y);
 
 % Waypoint Generator Using the A*
