@@ -112,8 +112,7 @@ Visualization Manager:
           Enabled: false
           Marker Topic: /odom_visualization_ukf/covariance
           Name: Cov UKF
-          Namespaces:
-            {}
+          Namespaces: {}
           Queue Size: 100
           Value: false
       Enabled: true
@@ -124,8 +123,7 @@ Visualization Manager:
           Enabled: true
           Marker Topic: /odom_visualization_slam/robot
           Name: Robot SLAM
-          Namespaces:
-            {}
+          Namespaces: {}
           Queue Size: 100
           Value: true
         - Alpha: 1
@@ -146,8 +144,7 @@ Visualization Manager:
           Enabled: true
           Marker Topic: /odom_visualization_slam/velocity
           Name: Velocity SLAM
-          Namespaces:
-            {}
+          Namespaces: {}
           Queue Size: 100
           Value: true
         - Alpha: 1
@@ -168,8 +165,7 @@ Visualization Manager:
           Enabled: false
           Marker Topic: /odom_visualization_slam/covariance
           Name: Cov SLAM
-          Namespaces:
-            {}
+          Namespaces: {}
           Queue Size: 100
           Value: false
       Enabled: false
@@ -284,8 +280,7 @@ Visualization Manager:
           Enabled: false
           Marker Topic: /visual_pose_estimator/loc_connect
           Name: Loc Err Lines
-          Namespaces:
-            {}
+          Namespaces: {}
           Queue Size: 100
           Value: false
         - Alpha: 1
@@ -379,24 +374,21 @@ Visualization Manager:
           Enabled: true
           Marker Topic: /visual_slam/pose_graph_odom
           Name: SLAM Pose Graph
-          Namespaces:
-            {}
+          Namespaces: {}
           Queue Size: 100
           Value: true
         - Class: rviz/Marker
           Enabled: true
           Marker Topic: /visual_slam/pose_graph_loop
           Name: SLAM Loop CLosure
-          Namespaces:
-            {}
+          Namespaces: {}
           Queue Size: 100
           Value: true
         - Class: rviz/Marker
           Enabled: false
           Marker Topic: /visual_slam/pose_graph_loop_tf
           Name: SLAM Loop TF
-          Namespaces:
-            {}
+          Namespaces: {}
           Queue Size: 100
           Value: false
       Enabled: true
@@ -555,24 +547,21 @@ Visualization Manager:
           Enabled: true
           Marker Topic: /monocular_velocity_estimator/plane
           Name: Plane
-          Namespaces:
-            {}
+          Namespaces: {}
           Queue Size: 100
           Value: true
         - Class: rviz/Marker
           Enabled: true
           Marker Topic: /monocular_velocity_estimator/normal
           Name: Normal
-          Namespaces:
-            {}
+          Namespaces: {}
           Queue Size: 100
           Value: true
         - Class: rviz/Marker
           Enabled: true
           Marker Topic: /monocular_velocity_estimator/velocity
           Name: Velocity
-          Namespaces:
-            {}
+          Namespaces: {}
           Queue Size: 100
           Value: true
       Enabled: true
@@ -592,8 +581,7 @@ Visualization Manager:
               Enabled: true
               Marker Topic: /odom_visualization_ukf_laser/robot
               Name: Robot Laser
-              Namespaces:
-                {}
+              Namespaces: {}
               Queue Size: 100
               Value: true
             - Alpha: 1
@@ -614,8 +602,7 @@ Visualization Manager:
               Enabled: true
               Marker Topic: /odom_visualization_ukf_laser/velocity
               Name: Velocity Laser
-              Namespaces:
-                {}
+              Namespaces: {}
               Queue Size: 100
               Value: true
             - Alpha: 1
@@ -636,8 +623,7 @@ Visualization Manager:
               Enabled: false
               Marker Topic: /odom_visualization_ukf_laser/covariance
               Name: Cov Laser
-              Namespaces:
-                {}
+              Namespaces: {}
               Queue Size: 100
               Value: false
           Enabled: false
@@ -648,8 +634,7 @@ Visualization Manager:
               Enabled: true
               Marker Topic: /odom_visualization_ukf_vision/robot
               Name: Robot Vision
-              Namespaces:
-                {}
+              Namespaces: {}
               Queue Size: 100
               Value: true
             - Alpha: 1
@@ -670,8 +655,7 @@ Visualization Manager:
               Enabled: false
               Marker Topic: /odom_visualization_ukf_vision/velocity
               Name: Velocity Vision
-              Namespaces:
-                {}
+              Namespaces: {}
               Queue Size: 100
               Value: false
             - Alpha: 1
@@ -692,8 +676,7 @@ Visualization Manager:
               Enabled: false
               Marker Topic: /odom_visualization_ukf_vision/covariance
               Name: Cov Vision
-              Namespaces:
-                {}
+              Namespaces: {}
               Queue Size: 100
               Value: false
             - Alpha: 1
@@ -733,8 +716,7 @@ Visualization Manager:
               Enabled: true
               Marker Topic: /odom_visualization_ukf_gps/robot
               Name: Robot GPS
-              Namespaces:
-                {}
+              Namespaces: {}
               Queue Size: 100
               Value: true
             - Alpha: 1
@@ -755,8 +737,7 @@ Visualization Manager:
               Enabled: true
               Marker Topic: /odom_visualization_ukf_gps/velocity
               Name: Velocity GPS
-              Namespaces:
-                {}
+              Namespaces: {}
               Queue Size: 100
               Value: true
             - Alpha: 1
@@ -777,8 +758,7 @@ Visualization Manager:
               Enabled: true
               Marker Topic: /odom_visualization_ukf_gps/covariance
               Name: Cov GPS
-              Namespaces:
-                {}
+              Namespaces: {}
               Queue Size: 100
               Value: true
           Enabled: false
@@ -789,8 +769,7 @@ Visualization Manager:
               Enabled: true
               Marker Topic: /odom_visualization_ukf_multi/robot
               Name: Robot Multi
-              Namespaces:
-                {}
+              Namespaces: {}
               Queue Size: 100
               Value: true
             - Alpha: 1
@@ -811,8 +790,7 @@ Visualization Manager:
               Enabled: true
               Marker Topic: /odom_visualization_ukf_multi/velocity
               Name: Velocity Multi
-              Namespaces:
-                {}
+              Namespaces: {}
               Queue Size: 100
               Value: true
             - Alpha: 1
@@ -833,32 +811,28 @@ Visualization Manager:
               Enabled: false
               Marker Topic: /odom_visualization_ukf_multi/trajectory
               Name: Traj Multi
-              Namespaces:
-                {}
+              Namespaces: {}
               Queue Size: 100
               Value: false
             - Class: rviz/Marker
               Enabled: true
               Marker Topic: /odom_visualization_ukf_multi/covariance
               Name: Cov Multi
-              Namespaces:
-                {}
+              Namespaces: {}
               Queue Size: 100
               Value: true
             - Class: rviz/Marker
               Enabled: false
               Marker Topic: /odom_visualization_ukf_multi/covariance_velocity
               Name: Cov Vel Multi
-              Namespaces:
-                {}
+              Namespaces: {}
               Queue Size: 100
               Value: false
             - Class: rviz/Marker
               Enabled: false
               Marker Topic: /multi_sensor_slam/graph
               Name: SLAM Graph
-              Namespaces:
-                {}
+              Namespaces: {}
               Queue Size: 100
               Value: false
             - Class: rviz_plugins/MultiProbMapDisplay
@@ -909,8 +883,7 @@ Visualization Manager:
               Enabled: true
               Marker Topic: /odom_visualization_ukf_multi/sensor
               Name: Sensor Availability
-              Namespaces:
-                {}
+              Namespaces: {}
               Queue Size: 100
               Value: true
           Enabled: true
@@ -923,8 +896,7 @@ Visualization Manager:
                   Enabled: true
                   Marker Topic: /odom_visualization_vins/robot
                   Name: Robot VINS
-                  Namespaces:
-                    {}
+                  Namespaces: {}
                   Queue Size: 100
                   Value: true
                 - Alpha: 1
@@ -945,8 +917,7 @@ Visualization Manager:
                   Enabled: true
                   Marker Topic: /odom_visualization_vins/velocity
                   Name: Velocity VINS
-                  Namespaces:
-                    {}
+                  Namespaces: {}
                   Queue Size: 100
                   Value: true
                 - Alpha: 1
@@ -1007,8 +978,7 @@ Visualization Manager:
                   Enabled: true
                   Marker Topic: /odom_visualization_nonlinear/robot
                   Name: Robot Nonlinear
-                  Namespaces:
-                    {}
+                  Namespaces: {}
                   Queue Size: 100
                   Value: true
                 - Alpha: 1
@@ -1029,8 +999,7 @@ Visualization Manager:
                   Enabled: true
                   Marker Topic: /odom_visualization_nonlinear/velocity
                   Name: Velocity Nonlinear
-                  Namespaces:
-                    {}
+                  Namespaces: {}
                   Queue Size: 100
                   Value: true
                 - Alpha: 1
@@ -1091,8 +1060,7 @@ Visualization Manager:
                   Enabled: true
                   Marker Topic: /odom_visualization_imu/robot
                   Name: Robot IMU
-                  Namespaces:
-                    {}
+                  Namespaces: {}
                   Queue Size: 100
                   Value: true
                 - Alpha: 1
@@ -1113,8 +1081,7 @@ Visualization Manager:
                   Enabled: true
                   Marker Topic: /odom_visualization_imu/velocity
                   Name: Velocity IMU
-                  Namespaces:
-                    {}
+                  Namespaces: {}
                   Queue Size: 100
                   Value: true
                 - Alpha: 1
@@ -1139,8 +1106,7 @@ Visualization Manager:
                   Enabled: true
                   Marker Topic: /odom_visualization_control/robot
                   Name: Robot Control
-                  Namespaces:
-                    {}
+                  Namespaces: {}
                   Queue Size: 100
                   Value: true
                 - Alpha: 1
@@ -1161,8 +1127,7 @@ Visualization Manager:
                   Enabled: false
                   Marker Topic: /odom_visualization_control/velocity
                   Name: Velocity Control
-                  Namespaces:
-                    {}
+                  Namespaces: {}
                   Queue Size: 100
                   Value: false
                 - Alpha: 1
@@ -1189,8 +1154,7 @@ Visualization Manager:
       Enabled: true
       Marker Topic: /irobot/irobot_marker
       Name: Marker
-      Namespaces:
-        {}
+      Namespaces: {}
       Queue Size: 100
       Value: true
   Enabled: true
