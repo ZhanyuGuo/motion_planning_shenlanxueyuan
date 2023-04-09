@@ -128,15 +128,10 @@ public:
     {
         // We know we're working with a RealVectorStateSpace in this
         // example, so we downcast state into the specific type.
-        const ob::RealVectorStateSpace::StateType *state3D =
-            state->as<ob::RealVectorStateSpace::StateType>();
+        const ob::RealVectorStateSpace::StateType *state3D = state->as<ob::RealVectorStateSpace::StateType>();
         /**
-        *
-        *
-        STEP 1: Extract the robot's (x,y,z) position from its state
-        *
-        *
-        */
+         * STEP 1: Extract the robot's (x,y,z) position from its state
+         */
         double x = (*state3D)[0];
         double y = (*state3D)[1];
         double z = (*state3D)[2];
@@ -186,12 +181,8 @@ void pathFinding(const Vector3d start_pt, const Vector3d target_pt)
     // Set our robot's starting state
     ob::ScopedState<> start(space);
     /**
-    *
-    *
-    STEP 2: Finish the initialization of start state
-    *
-    *
-    */
+     * STEP 2: Finish the initialization of start state
+     */
     start[0] = start_pt(0);
     start[1] = start_pt(1);
     start[2] = start_pt(2);
@@ -199,12 +190,8 @@ void pathFinding(const Vector3d start_pt, const Vector3d target_pt)
     // Set our robot's goal state
     ob::ScopedState<> goal(space);
     /**
-    *
-    *
-    STEP 3: Finish the initialization of goal state
-    *
-    *
-    */
+     * STEP 3: Finish the initialization of goal state
+     */
     goal[0] = target_pt(0);
     goal[1] = target_pt(1);
     goal[2] = target_pt(2);
@@ -212,13 +199,9 @@ void pathFinding(const Vector3d start_pt, const Vector3d target_pt)
     // Create a problem instance
 
     /**
-    *
-    *
-    STEP 4: Create a problem instance,
-    please define variable as pdef
-    *
-    *
-    */
+     * STEP 4: Create a problem instance,
+     * please define variable as pdef
+     */
     ob::ProblemDefinitionPtr pdef(std::make_shared<ob::ProblemDefinition>(si));
 
     // Set the start and goal states
@@ -226,38 +209,28 @@ void pathFinding(const Vector3d start_pt, const Vector3d target_pt)
 
     // Set the optimization objective
     /**
-    *
-    *
-    STEP 5: Set the optimization objective, the options you can choose are defined earlier:
-    getPathLengthObjective() and getThresholdPathLengthObj()
-    *
-    *
-    */
+     * STEP 5: Set the optimization objective, the options you can choose are defined earlier:
+     * getPathLengthObjective() and getThresholdPathLengthObj()
+     */
     pdef->setOptimizationObjective(getPathLengthObjective(si));
 
     // Construct our optimizing planner using the RRTstar algorithm.
     /**
-    *
-    *
-    STEP 6: Construct our optimizing planner using the RRTstar algorithm,
-    please define varible as optimizingPlanner
-    *
-    *
-    */
+     * STEP 6: Construct our optimizing planner using the RRTstar algorithm,
+     * please define varible as optimizingPlanner
+     */
     ob::PlannerPtr optimizingPlanner(std::make_shared<og::RRTstar>(si));
 
     // Set the problem instance for our planner to solve
     optimizingPlanner->setProblemDefinition(pdef);
     optimizingPlanner->setup();
 
-    // attempt to solve the planning problem within one second of
-    // planning time
+    // attempt to solve the planning problem within one second of planning time
     ob::PlannerStatus solved = optimizingPlanner->solve(1.0);
 
     if (solved)
     {
-        // get the goal representation from the problem definition (not the same as the goal state)
-        // and inquire about the found path
+        // get the goal representation from the problem definition (not the same as the goal state) and inquire about the found path
         og::PathGeometric *path = pdef->getSolutionPath()->as<og::PathGeometric>();
 
         vector<Vector3d> path_points;
@@ -266,16 +239,50 @@ void pathFinding(const Vector3d start_pt, const Vector3d target_pt)
         {
             const ob::RealVectorStateSpace::StateType *state = path->getState(path_idx)->as<ob::RealVectorStateSpace::StateType>();
             /**
-            *
-            *
-            STEP 7: Trandform the found path from path to path_points for rviz display
-            *
-            *
-            */
+             * STEP 7: Trandform the found path from path to path_points for rviz display
+             */
             path_points.push_back(Vector3d((*state)[0], (*state)[1], (*state)[2]));
         }
         visRRTstarPath(path_points);
     }
+}
+
+void visRRTstarPath(vector<Vector3d> nodes)
+{
+    visualization_msgs::Marker Points, Line;
+    Points.header.frame_id = Line.header.frame_id = "world";
+    Points.header.stamp = Line.header.stamp = ros::Time::now();
+    Points.ns = Line.ns = "demo_node/RRTstarPath";
+    Points.action = Line.action = visualization_msgs::Marker::ADD;
+    Points.pose.orientation.w = Line.pose.orientation.w = 1.0;
+    Points.id = 0;
+    Line.id = 1;
+    Points.type = visualization_msgs::Marker::POINTS;
+    Line.type = visualization_msgs::Marker::LINE_STRIP;
+
+    Points.scale.x = _resolution / 2;
+    Points.scale.y = _resolution / 2;
+    Line.scale.x = _resolution / 2;
+
+    // points are green and Line Strip is blue
+    Points.color.g = 1.0f;
+    Points.color.a = 1.0;
+    Line.color.b = 1.0;
+    Line.color.a = 1.0;
+
+    geometry_msgs::Point pt;
+    for (int i = 0; i < int(nodes.size()); i++)
+    {
+        Vector3d coord = nodes[i];
+        pt.x = coord(0);
+        pt.y = coord(1);
+        pt.z = coord(2);
+
+        Points.points.push_back(pt);
+        Line.points.push_back(pt);
+    }
+    _RRTstar_path_vis_pub.publish(Points);
+    _RRTstar_path_vis_pub.publish(Line);
 }
 
 int main(int argc, char **argv)
@@ -322,43 +329,6 @@ int main(int argc, char **argv)
     }
 
     delete _RRTstar_preparatory;
+
     return 0;
-}
-
-void visRRTstarPath(vector<Vector3d> nodes)
-{
-    visualization_msgs::Marker Points, Line;
-    Points.header.frame_id = Line.header.frame_id = "world";
-    Points.header.stamp = Line.header.stamp = ros::Time::now();
-    Points.ns = Line.ns = "demo_node/RRTstarPath";
-    Points.action = Line.action = visualization_msgs::Marker::ADD;
-    Points.pose.orientation.w = Line.pose.orientation.w = 1.0;
-    Points.id = 0;
-    Line.id = 1;
-    Points.type = visualization_msgs::Marker::POINTS;
-    Line.type = visualization_msgs::Marker::LINE_STRIP;
-
-    Points.scale.x = _resolution / 2;
-    Points.scale.y = _resolution / 2;
-    Line.scale.x = _resolution / 2;
-
-    // points are green and Line Strip is blue
-    Points.color.g = 1.0f;
-    Points.color.a = 1.0;
-    Line.color.b = 1.0;
-    Line.color.a = 1.0;
-
-    geometry_msgs::Point pt;
-    for (int i = 0; i < int(nodes.size()); i++)
-    {
-        Vector3d coord = nodes[i];
-        pt.x = coord(0);
-        pt.y = coord(1);
-        pt.z = coord(2);
-
-        Points.points.push_back(pt);
-        Line.points.push_back(pt);
-    }
-    _RRTstar_path_vis_pub.publish(Points);
-    _RRTstar_path_vis_pub.publish(Line);
 }

@@ -8,9 +8,13 @@
     "cmake.configureOnOpen": false,
     "matlab.mlintpath": "/home/gzy/MATLAB/R2022b/bin/glnxa64/mlint",
     "matlab.matlabpath": "/home/gzy/MATLAB/R2022b/bin/matlab",
-    "matlab.linterEncoding": "utf8",
+    "matlab.linterEncoding": "gb2312",
+    "[matlab]": {
+        "files.encoding": "gb2312",
+        "files.autoGuessEncoding": false,
+    },
     "files.associations": {
         "*.m": "matlab",
-        "cmath": "cpp"
+        "core": "cpp"
     }
 }
