@@ -139,7 +139,7 @@ void pathFinding(const Vector3d start_pt, const Vector3d target_pt)
 
         // Visualize the result
         visGridPath(grid_path, _use_jps);
-        visVisitedNode(visited_nodes);
+        // visVisitedNode(visited_nodes);
 
         // Reset map for next call
         _jps_path_finder->resetUsedGrids();
@@ -275,7 +275,7 @@ int main(int argc, char **argv)
     _jps_path_finder = new JPSPathFinder();
     _jps_path_finder->initGridMap(_resolution, _map_lower, _map_upper, _max_x_id, _max_y_id, _max_z_id);
 
-    ros::Rate rate(10);
+    ros::Rate rate(100);
     bool status = ros::ok();
     while (status)
     {

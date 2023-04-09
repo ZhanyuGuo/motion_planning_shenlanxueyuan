@@ -10,6 +10,7 @@
     "matlab.matlabpath": "/home/gzy/MATLAB/R2022b/bin/matlab",
     "matlab.linterEncoding": "utf8",
     "files.associations": {
-        "*.m": "matlab"
+        "*.m": "matlab",
+        "cmath": "cpp"
     }
 }

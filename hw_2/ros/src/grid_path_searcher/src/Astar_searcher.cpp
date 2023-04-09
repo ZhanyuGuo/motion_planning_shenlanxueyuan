@@ -60,8 +60,7 @@ void AstarPathFinder::resetUsedGrids()
 
 void AstarPathFinder::setObs(const double coord_x, const double coord_y, const double coord_z)
 {
-    if (coord_x < gl_xl || coord_y < gl_yl || coord_z < gl_zl ||
-        coord_x >= gl_xu || coord_y >= gl_yu || coord_z >= gl_zu)
+    if (coord_x < gl_xl || coord_y < gl_yl || coord_z < gl_zl || coord_x >= gl_xu || coord_y >= gl_yu || coord_z >= gl_zu)
         return;
 
     int idx_x = static_cast<int>((coord_x - gl_xl) * inv_resolution);
@@ -139,13 +138,7 @@ inline void AstarPathFinder::AstarGetSucc(GridNodePtr currentPtr, vector<GridNod
 {
     neighborPtrSets.clear();
     edgeCostSets.clear();
-    /*
-    *
-    STEP 4: finish AstarPathFinder::AstarGetSucc yourself
-    please write your code below
-    *
-    *
-    */
+
     Vector3i currentIdx = currentPtr->index;
     Vector3i nIdx;
     GridNodePtr nPtr;
@@ -176,31 +169,50 @@ inline void AstarPathFinder::AstarGetSucc(GridNodePtr currentPtr, vector<GridNod
                 nPtr = GridNodeMap[nIdx(0)][nIdx(1)][nIdx(2)];
                 neighborPtrSets.push_back(nPtr);
 
-                tmpGn = getHeu(currentPtr, nPtr);
-                if (tmpGn == 0)
-                {
-                    tmpGn = (currentPtr->index - nPtr->index).norm();
-                }
+                tmpGn = getCost(currentPtr, nPtr);
                 edgeCostSets.push_back(tmpGn);
             }
         }
     }
 }
 
+double AstarPathFinder::getCost(GridNodePtr node1, GridNodePtr node2)
+{
+    double g;
+
+    enum Htype
+    {
+        Euclidean,
+        Manhattan,
+    } htype;
+
+    htype = Euclidean;
+    switch (htype)
+    {
+    case Euclidean:
+        g = (node1->index - node2->index).cast<double>().norm();
+        break;
+    case Manhattan:
+        g = (node1->index - node2->index).lpNorm<1>();
+        break;
+    default:
+        g = (node1->index - node2->index).cast<double>().norm();
+        break;
+    }
+
+    return g;
+}
+
 double AstarPathFinder::getHeu(GridNodePtr node1, GridNodePtr node2)
 {
-    /*
-    choose possible heuristic function you want
-    Manhattan, Euclidean, Diagonal, or 0 (Dijkstra)
-    Remember tie_breaker learned in lecture, add it here ?
-    *
-    *
-    *
-    STEP 1: finish the AstarPathFinder::getHeu , which is the heuristic function
-    please write your code below
-    *
-    *
-    */
+    /**
+     * choose possible heuristic function you want
+     * Manhattan, Euclidean, Diagonal, or 0 (Dijkstra)
+     *
+     * STEP 1: finish the AstarPathFinder::getHeu, which is the heuristic function
+     * please write your code below
+     *
+     */
     double h;
 
     enum Htype
@@ -245,11 +257,12 @@ double AstarPathFinder::getHeu(GridNodePtr node1, GridNodePtr node2)
         break;
     }
     default:
-        h = (node1->index - node2->index).lpNorm<1>();
+        h = (node1->index - node2->index).cast<double>().norm();
         break;
     }
 
-    h = (1 + 1 / 1000) * h;
+    // tie breaker
+    h = (1 + 1 / 100) * h;
 
     return h;
 }
@@ -282,34 +295,26 @@ void AstarPathFinder::AstarGraphSearch(Vector3d start_pt, Vector3d end_pt)
 
     // put start node in open set
     startPtr->gScore = 0;
-    startPtr->fScore = getHeu(startPtr, endPtr);
     // STEP 1: finish the AstarPathFinder::getHeu, which is the heuristic function
+    startPtr->fScore = startPtr->gScore + getHeu(startPtr, endPtr);
     startPtr->id = 1;
     openSet.insert(make_pair(startPtr->fScore, startPtr));
-    /*
-    *
-    STEP 2 :  some else preparatory works which should be done before while loop
-    please write your code below
-    *
-    *
-    */
+    /**
+     * STEP 2 :  some else preparatory works which should be done before while loop
+     * please write your code below
+     */
     vector<GridNodePtr> neighborPtrSets;
     vector<double> edgeCostSets;
 
     // this is the main loop
     while (!openSet.empty())
     {
-        /*
-        *
-        *
-        step 3: Remove the node with lowest cost function from open set to closed set
-        please write your code below
-
-        IMPORTANT NOTE!!!
-        This part you should use the C++ STL: multimap, more details can be find in Homework description
-        *
-        *
-        */
+        /**
+         * STEP 3: Remove the node with lowest cost function from open set to closed set
+         * IMPORTANT NOTE!!!
+         * This part you should use the C++ STL: multimap, more details can be find in Homework description
+         * please write your code below
+         */
         currentPtr = openSet.begin()->second;
         currentPtr->id = -1;
         openSet.erase(openSet.begin());
@@ -322,42 +327,29 @@ void AstarPathFinder::AstarGraphSearch(Vector3d start_pt, Vector3d end_pt)
             ROS_WARN("[A*]{sucess}  Time in A*  is %f ms, path cost if %f m", (time_2 - time_1).toSec() * 1000.0, currentPtr->gScore * resolution);
             return;
         }
-        // get the succetion
-        AstarGetSucc(currentPtr, neighborPtrSets, edgeCostSets); // STEP 4: finish AstarPathFinder::AstarGetSucc yourself
-
-        /*
-        *
-        *
-        STEP 5:  For all unexpanded neigbors "m" of node "n", please finish this for loop
-        please write your code below
-        *
-        */
+        // STEP 4: finish AstarPathFinder::AstarGetSucc yourself
+        AstarGetSucc(currentPtr, neighborPtrSets, edgeCostSets);
+        /**
+         * STEP 5:  For all unexpanded neigbors "m" of node "n", please finish this for loop
+         * please write your code below
+         */
         for (int i = 0; i < (int)neighborPtrSets.size(); i++)
         {
-            /*
-            *
-            *
-            Judge if the neigbors have been expanded
-            please write your code below
-
-            IMPORTANT NOTE!!!
-            neighborPtrSets[i]->id = -1 : unexpanded
-            neighborPtrSets[i]->id = 1 : expanded, equal to this node is in close set
-            *
-            */
+            /**
+             * Judge if the neigbors have been expanded
+             * please write your code below
+             * id: 1--> open set, -1 --> closed set
+             */
             neighborPtr = neighborPtrSets[i];
             double g = currentPtr->gScore + edgeCostSets[i];
             double f = g + getHeu(neighborPtr, endPtr);
 
             if (neighborPtr->id == 0)
-            { // discover a new node, which is not in the closed set and open set
-                /*
-                *
-                *
-                STEP 6:  As for a new node, do what you need do ,and then put neighbor in open set and record it
-                please write your code below
-                *
-                */
+            {
+                /**
+                 * STEP 6:  As for a new node, do what you need do ,and then put neighbor in open set and record it
+                 * please write your code below
+                 */
                 neighborPtr->gScore = g;
                 neighborPtr->fScore = f;
                 neighborPtr->cameFrom = currentPtr;
@@ -366,14 +358,11 @@ void AstarPathFinder::AstarGraphSearch(Vector3d start_pt, Vector3d end_pt)
                 continue;
             }
             else if (neighborPtr->id == 1)
-            { // this node is in open set and need to judge if it needs to update, the "0" should be deleted when you are coding
-                /*
-                *
-                *
-                STEP 7:  As for a node in open set, update it , maintain the openset ,and then put neighbor in open set and record it
-                please write your code below
-                *
-                */
+            {
+                /**
+                 * STEP 7:  As for a node in open set, update it , maintain the openset ,and then put neighbor in open set and record it
+                 * please write your code below
+                 */
                 if (neighborPtr->gScore > g)
                 {
                     neighborPtr->gScore = g;
@@ -385,12 +374,8 @@ void AstarPathFinder::AstarGraphSearch(Vector3d start_pt, Vector3d end_pt)
                 continue;
             }
             else
-            { // this node is in closed set
-                /*
-                *
-                please write your code below
-                *
-                */
+            {
+                // this node is in closed set
                 continue;
             }
         }
@@ -405,13 +390,9 @@ vector<Vector3d> AstarPathFinder::getPath()
 {
     vector<Vector3d> path;
     vector<GridNodePtr> gridPath;
-    /*
-    *
-    *
-    STEP 8:  trace back from the curretnt nodePtr to get all nodes along the path
-    please write your code below
-    *
-    */
+    /**
+     * STEP 8:  trace back from the curretnt nodePtr to get all nodes along the path please write your code below
+     */
     GridNodePtr tmpPtr = terminatePtr;
     while (tmpPtr->cameFrom != NULL)
     {
