@@ -8,8 +8,8 @@
             "includePath": [
                 "/opt/ros/noetic/include/**",
                 "/usr/include/**",
-                "/home/gzy/Workspace/motion_plan_dark_blue/hw_1/src/grid_path_searcher/include/",
-                "/home/gzy/Workspace/motion_plan_dark_blue/hw_2/ros/src/grid_path_searcher/include/"
+                "/home/gzy/Workspace/motion_planning_shenlanxueyuan/hw_1/src/grid_path_searcher/include/",
+                "/home/gzy/Workspace/motion_planning_shenlanxueyuan/hw_2/ros/src/grid_path_searcher/include/"
             ],
             "name": "ROS",
             "intelliSenseMode": "gcc-x64",

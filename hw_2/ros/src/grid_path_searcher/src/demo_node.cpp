@@ -147,58 +147,6 @@ void pathFinding(const Vector3d start_pt, const Vector3d target_pt)
 #endif
 }
 
-int main(int argc, char **argv)
-{
-    ros::init(argc, argv, "demo_node");
-    ros::NodeHandle nh("~");
-
-    _map_sub = nh.subscribe("map", 1, rcvPointCloudCallBack);
-    _pts_sub = nh.subscribe("waypoints", 1, rcvWaypointsCallback);
-
-    _grid_map_vis_pub = nh.advertise<sensor_msgs::PointCloud2>("grid_map_vis", 1);
-    _grid_path_vis_pub = nh.advertise<visualization_msgs::Marker>("grid_path_vis", 1);
-    _visited_nodes_vis_pub = nh.advertise<visualization_msgs::Marker>("visited_nodes_vis", 1);
-
-    nh.param("map/cloud_margin", _cloud_margin, 0.0);
-    nh.param("map/resolution", _resolution, 0.2);
-
-    nh.param("map/x_size", _x_size, 50.0);
-    nh.param("map/y_size", _y_size, 50.0);
-    nh.param("map/z_size", _z_size, 5.0);
-
-    nh.param("planning/start_x", _start_pt(0), 0.0);
-    nh.param("planning/start_y", _start_pt(1), 0.0);
-    nh.param("planning/start_z", _start_pt(2), 0.0);
-
-    _map_lower << -_x_size / 2.0, -_y_size / 2.0, 0.0;
-    _map_upper << +_x_size / 2.0, +_y_size / 2.0, _z_size;
-
-    _inv_resolution = 1.0 / _resolution;
-
-    _max_x_id = (int)(_x_size * _inv_resolution);
-    _max_y_id = (int)(_y_size * _inv_resolution);
-    _max_z_id = (int)(_z_size * _inv_resolution);
-
-    _astar_path_finder = new AstarPathFinder();
-    _astar_path_finder->initGridMap(_resolution, _map_lower, _map_upper, _max_x_id, _max_y_id, _max_z_id);
-
-    _jps_path_finder = new JPSPathFinder();
-    _jps_path_finder->initGridMap(_resolution, _map_lower, _map_upper, _max_x_id, _max_y_id, _max_z_id);
-
-    ros::Rate rate(100);
-    bool status = ros::ok();
-    while (status)
-    {
-        ros::spinOnce();
-        status = ros::ok();
-        rate.sleep();
-    }
-
-    delete _astar_path_finder;
-    delete _jps_path_finder;
-    return 0;
-}
-
 void visGridPath(vector<Vector3d> nodes, bool is_use_jps)
 {
     visualization_msgs::Marker node_vis;
@@ -287,4 +235,57 @@ void visVisitedNode(vector<Vector3d> nodes)
     }
 
     _visited_nodes_vis_pub.publish(node_vis);
+}
+
+int main(int argc, char **argv)
+{
+    ros::init(argc, argv, "demo_node");
+    ros::NodeHandle nh("~");
+
+    _map_sub = nh.subscribe("map", 1, rcvPointCloudCallBack);
+    _pts_sub = nh.subscribe("waypoints", 1, rcvWaypointsCallback);
+
+    _grid_map_vis_pub = nh.advertise<sensor_msgs::PointCloud2>("grid_map_vis", 1);
+    _grid_path_vis_pub = nh.advertise<visualization_msgs::Marker>("grid_path_vis", 1);
+    _visited_nodes_vis_pub = nh.advertise<visualization_msgs::Marker>("visited_nodes_vis", 1);
+
+    nh.param("map/cloud_margin", _cloud_margin, 0.0);
+    nh.param("map/resolution", _resolution, 0.2);
+
+    nh.param("map/x_size", _x_size, 50.0);
+    nh.param("map/y_size", _y_size, 50.0);
+    nh.param("map/z_size", _z_size, 5.0);
+
+    nh.param("planning/start_x", _start_pt(0), 0.0);
+    nh.param("planning/start_y", _start_pt(1), 0.0);
+    nh.param("planning/start_z", _start_pt(2), 0.0);
+
+    _map_lower << -_x_size / 2.0, -_y_size / 2.0, 0.0;
+    _map_upper << +_x_size / 2.0, +_y_size / 2.0, _z_size;
+
+    _inv_resolution = 1.0 / _resolution;
+
+    _max_x_id = (int)(_x_size * _inv_resolution);
+    _max_y_id = (int)(_y_size * _inv_resolution);
+    _max_z_id = (int)(_z_size * _inv_resolution);
+
+    _astar_path_finder = new AstarPathFinder();
+    _astar_path_finder->initGridMap(_resolution, _map_lower, _map_upper, _max_x_id, _max_y_id, _max_z_id);
+
+    _jps_path_finder = new JPSPathFinder();
+    _jps_path_finder->initGridMap(_resolution, _map_lower, _map_upper, _max_x_id, _max_y_id, _max_z_id);
+
+    ros::Rate rate(10);
+    bool status = ros::ok();
+    while (status)
+    {
+        ros::spinOnce();
+        status = ros::ok();
+        rate.sleep();
+    }
+
+    delete _astar_path_finder;
+    delete _jps_path_finder;
+
+    return 0;
 }
