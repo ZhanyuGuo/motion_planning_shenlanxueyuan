@@ -85,17 +85,14 @@ Eigen::Vector3d Homeworktool::coordRounding(const Eigen::Vector3d &coord)
 
 double Homeworktool::OptimalBVP(Eigen::Vector3d _start_position, Eigen::Vector3d _start_velocity, Eigen::Vector3d _target_position)
 {
-    double optimal_cost = 100000; // this just to initial the optimal_cost, you can delete it
-    /*
+    double optimal_cost = 100000.0; // this just to initial the optimal_cost, you can delete it
 
-        STEP 2: go to the hw_tool.cpp and finish the function Homeworktool::OptimalBVP
-        the solving process has been given in the document
-
-        because the final point of trajectory is the start point of OBVP, so we input the pos,vel to the OBVP
-
-        after finish Homeworktool::OptimalBVP, the Trajctory_Cost will record the optimal cost of this trajectory
-
-    */
+    /**
+     * STEP 2: go to the hw_tool.cpp and finish the function Homeworktool::OptimalBVP
+     * the solving process has been given in the document
+     * because the final point of trajectory is the start point of OBVP, so we input the pos,vel to the OBVP
+     * after finish Homeworktool::OptimalBVP, the Trajctory_Cost will record the optimal cost of this trajectory
+     */
     double pxf = _target_position(0);
     double pyf = _target_position(1);
     double pzf = _target_position(2);

@@ -114,6 +114,7 @@ void trajectoryLibrary(const Vector3d start_pt, const Vector3d start_velocity, c
 {
     Vector3d acc_input;
     Vector3d pos, vel;
+
     int a = 0;
     int b = 0;
     int c = 0;
@@ -123,14 +124,16 @@ void trajectoryLibrary(const Vector3d start_pt, const Vector3d start_velocity, c
     TraLibrary = new TrajectoryStatePtr **[_discretize_step + 1]; // recored all trajectories after input
 
     for (int i = 0; i <= _discretize_step; i++)
-    { // acc_input_ax
+    {
+        // acc_input_ax
         TraLibrary[i] = new TrajectoryStatePtr *[_discretize_step + 1];
         for (int j = 0; j <= _discretize_step; j++)
-        { // acc_input_ay
+        {
+            // acc_input_ay
             TraLibrary[i][j] = new TrajectoryStatePtr[_discretize_step + 1];
             for (int k = 0; k <= _discretize_step; k++)
-            { // acc_input_az
-
+            {
+                // acc_input_az
                 vector<Vector3d> Position;
                 vector<Vector3d> Velocity;
                 acc_input(0) = double(-_max_input_acc + i * (2 * _max_input_acc / double(_discretize_step)));
@@ -152,13 +155,11 @@ void trajectoryLibrary(const Vector3d start_pt, const Vector3d start_velocity, c
 
                 for (int step = 0; step <= _time_step; step++)
                 {
-                    /*
-
-                        STEP 1: finish the forward integration, the modelling has been given in the document
-                        the parameter of forward integration: _max_input_acc|_discretize_step|_time_interval|_time_step   all have been given
-                        use the pos and vel to recored the steps in the trakectory
-
-                    */
+                    /**
+                     * STEP 1: finish the forward integration, the modelling has been given in the document
+                     * the parameter of forward integration: _max_input_acc|_discretize_step|_time_interval|_time_step   all have been given
+                     * use the pos and vel to recored the steps in the trakectory
+                     */
                     pos(0) = pos(0) + vel(0) * delta_time + 0.5 * acc_input(0) * delta_time * delta_time;
                     pos(1) = pos(1) + vel(1) * delta_time + 0.5 * acc_input(1) * delta_time * delta_time;
                     pos(2) = pos(2) + vel(2) * delta_time + 0.5 * acc_input(2) * delta_time * delta_time;
@@ -178,16 +179,12 @@ void trajectoryLibrary(const Vector3d start_pt, const Vector3d start_velocity, c
                         collision = true;
                     }
                 }
-                /*
-
-                    STEP 2: go to the hw_tool.cpp and finish the function Homeworktool::OptimalBVP
-                    the solving process has been given in the document
-
-                    because the final point of trajectory is the start point of OBVP, so we input the pos,vel to the OBVP
-
-                    after finish Homeworktool::OptimalBVP, the Trajctory_Cost will record the optimal cost of this trajectory
-
-                */
+                /**
+                 * STEP 2: go to the hw_tool.cpp and finish the function Homeworktool::OptimalBVP
+                 * the solving process has been given in the document
+                 * because the final point of trajectory is the start point of OBVP, so we input the pos,vel to the OBVP
+                 * after finish Homeworktool::OptimalBVP, the Trajctory_Cost will record the optimal cost of this trajectory
+                 */
                 Trajctory_Cost = _homework_tool->OptimalBVP(pos, vel, target_pt);
 
                 // input the trajetory in the trajectory library
@@ -210,58 +207,8 @@ void trajectoryLibrary(const Vector3d start_pt, const Vector3d start_velocity, c
     }
     TraLibrary[a][b][c]->setOptimal();
     visTraLibrary(TraLibrary);
+
     return;
-}
-
-int main(int argc, char **argv)
-{
-    ros::init(argc, argv, "demo_node");
-    ros::NodeHandle nh("~");
-
-    _map_sub = nh.subscribe("map", 1, rcvPointCloudCallBack);
-    _pts_sub = nh.subscribe("waypoints", 1, rcvWaypointsCallback);
-
-    _grid_map_vis_pub = nh.advertise<sensor_msgs::PointCloud2>("grid_map_vis", 1);
-    _path_vis_pub = nh.advertise<visualization_msgs::MarkerArray>("RRTstar_path_vis", 1);
-
-    nh.param("map/cloud_margin", _cloud_margin, 0.0);
-    nh.param("map/resolution", _resolution, 0.2);
-
-    nh.param("map/x_size", _x_size, 50.0);
-    nh.param("map/y_size", _y_size, 50.0);
-    nh.param("map/z_size", _z_size, 5.0);
-
-    nh.param("planning/start_x", _start_pt(0), 0.0);
-    nh.param("planning/start_y", _start_pt(1), 0.0);
-    nh.param("planning/start_z", _start_pt(2), 0.0);
-
-    nh.param("planning/start_vx", _start_velocity(0), 0.0);
-    nh.param("planning/start_vy", _start_velocity(1), 0.0);
-    nh.param("planning/start_vz", _start_velocity(2), 0.0);
-
-    _map_lower << -_x_size / 2.0, -_y_size / 2.0, 0.0;
-    _map_upper << +_x_size / 2.0, +_y_size / 2.0, _z_size;
-
-    _inv_resolution = 1.0 / _resolution;
-
-    _max_x_id = (int)(_x_size * _inv_resolution);
-    _max_y_id = (int)(_y_size * _inv_resolution);
-    _max_z_id = (int)(_z_size * _inv_resolution);
-
-    _homework_tool = new Homeworktool();
-    _homework_tool->initGridMap(_resolution, _map_lower, _map_upper, _max_x_id, _max_y_id, _max_z_id);
-
-    ros::Rate rate(100);
-    bool status = ros::ok();
-    while (status)
-    {
-        ros::spinOnce();
-        status = ros::ok();
-        rate.sleep();
-    }
-
-    delete _homework_tool;
-    return 0;
 }
 
 void visTraLibrary(TrajectoryStatePtr ***TraLibrary)
@@ -332,4 +279,56 @@ void visTraLibrary(TrajectoryStatePtr ***TraLibrary)
             }
         }
     }
+}
+
+int main(int argc, char **argv)
+{
+    ros::init(argc, argv, "demo_node");
+    ros::NodeHandle nh("~");
+
+    _map_sub = nh.subscribe("map", 1, rcvPointCloudCallBack);
+    _pts_sub = nh.subscribe("waypoints", 1, rcvWaypointsCallback);
+
+    _grid_map_vis_pub = nh.advertise<sensor_msgs::PointCloud2>("grid_map_vis", 1);
+    _path_vis_pub = nh.advertise<visualization_msgs::MarkerArray>("RRTstar_path_vis", 1);
+
+    nh.param("map/cloud_margin", _cloud_margin, 0.0);
+    nh.param("map/resolution", _resolution, 0.2);
+
+    nh.param("map/x_size", _x_size, 50.0);
+    nh.param("map/y_size", _y_size, 50.0);
+    nh.param("map/z_size", _z_size, 5.0);
+
+    nh.param("planning/start_x", _start_pt(0), 0.0);
+    nh.param("planning/start_y", _start_pt(1), 0.0);
+    nh.param("planning/start_z", _start_pt(2), 0.0);
+
+    nh.param("planning/start_vx", _start_velocity(0), 0.0);
+    nh.param("planning/start_vy", _start_velocity(1), 0.0);
+    nh.param("planning/start_vz", _start_velocity(2), 0.0);
+
+    _map_lower << -_x_size / 2.0, -_y_size / 2.0, 0.0;
+    _map_upper << +_x_size / 2.0, +_y_size / 2.0, _z_size;
+
+    _inv_resolution = 1.0 / _resolution;
+
+    _max_x_id = (int)(_x_size * _inv_resolution);
+    _max_y_id = (int)(_y_size * _inv_resolution);
+    _max_z_id = (int)(_z_size * _inv_resolution);
+
+    _homework_tool = new Homeworktool();
+    _homework_tool->initGridMap(_resolution, _map_lower, _map_upper, _max_x_id, _max_y_id, _max_z_id);
+
+    ros::Rate rate(100);
+    bool status = ros::ok();
+    while (status)
+    {
+        ros::spinOnce();
+        status = ros::ok();
+        rate.sleep();
+    }
+
+    delete _homework_tool;
+
+    return 0;
 }
