@@ -1,21 +1,24 @@
-clc;clear;close all;
+close all; clear; clc;
 
-axis([0 100 0 100]);
+figure; axis([0 100 0 100]); hold on;
+
 path = [];
 cnt = 0;
+
 while true
     tmp = ginput(1);
+
     if size(tmp, 1) == 0
         break;
     else
         cnt = cnt + 1;
         path(cnt, :) = tmp;
         scatter(tmp(1), tmp(2));
-        axis([0 100 0 100]);
-        hold on
     end
+
 end
-% path = ginput() * 100.0;
+
+% Not visible
 % path = ginput();
 
 n_order = 7; % order of poly
@@ -26,22 +29,23 @@ ts = zeros(n_seg, 1); % time distribution
 % calculate time distribution in proportion to distance between 2 points
 dist = zeros(n_seg, 1);
 dist_sum = 0;
-T = 25;
+T = n_seg;
 t_sum = 0;
 
-for i = 1: n_seg
-    dist(i) = sqrt((path(i + 1, 1) - path(i, 1))^2 + (path(i + 1, 2) - path(i, 2))^2);
+for i = 1:n_seg
+    dist(i) = sqrt((path(i + 1, 1) - path(i, 1)) ^ 2 + (path(i + 1, 2) - path(i, 2)) ^ 2);
     dist_sum = dist_sum + dist(i);
 end
 
-for i = 1: n_seg - 1
+for i = 1:n_seg - 1
     ts(i) = dist(i) / dist_sum * T;
     t_sum = t_sum + ts(i);
 end
+
 ts(n_seg) = T - t_sum;
 
 % or you can simply set all time distribution as 1
-% for i = 1: n_seg
+% for i = 1:n_seg
 %     ts(i) = 1.0;
 % end
 
@@ -49,36 +53,33 @@ poly_coef_x = MinimumSnapQPSolver(path(:, 1), ts, n_seg, n_order);
 poly_coef_y = MinimumSnapQPSolver(path(:, 2), ts, n_seg, n_order);
 
 % display the trajectory
-% X_n = [];
-% Y_n = [];
-
 tstep = 0.01;
 pts = T / tstep + 1;
 X_n = zeros(pts, 1);
 Y_n = zeros(pts, 1);
 k = 1;
 
-for i = 0: n_seg - 1
+for i = 0:n_seg - 1
     % ##########################################################################
     %   STEP 3: get the coefficients of i-th segment of both x-axis and y-axis
     % ##########################################################################
-    Pxi = poly_coef_x((n_order + 1) * i + 1: (n_order + 1) * i + n_order + 1);
-    Pyi = poly_coef_y((n_order + 1) * i + 1: (n_order + 1) * i + n_order + 1);
-    for t = 0: tstep: ts(i + 1)
+    Pxi = poly_coef_x((n_order + 1) * i + 1:(n_order + 1) * (i + 1));
+    Pyi = poly_coef_y((n_order + 1) * i + 1:(n_order + 1) * (i + 1));
+
+    for t = 0:tstep:ts(i + 1)
         X_n(k) = polyval(flipud(Pxi), t);
         Y_n(k) = polyval(flipud(Pyi), t);
         k = k + 1;
     end
+
 end
 
-plot(X_n, Y_n , 'Color', [0 1.0 0], 'LineWidth', 2);
-axis([0 100 0 100]);
-hold on
-scatter(path(1: size(path, 1), 1), path(1: size(path, 1), 2));
+plot(X_n, Y_n, 'Color', [0 1.0 0], 'LineWidth', 2);
 
 function poly_coef = MinimumSnapQPSolver(waypoints, ts, n_seg, n_order)
     start_cond = [waypoints(1), 0, 0, 0];
     end_cond = [waypoints(end), 0, 0, 0];
+
     % #############################
     %   STEP 1: compute Q of p'Qp
     % #############################
