@@ -6,11 +6,11 @@
         "/opt/ros/noetic/lib/python3/dist-packages"
     ],
     "cmake.configureOnOpen": false,
-    "matlab.mlintpath": "/home/gzy/MATLAB/R2022b/bin/glnxa64/mlint",
-    "matlab.matlabpath": "/home/gzy/MATLAB/R2022b/bin/matlab",
-    "matlab.linterEncoding": "gb2312",
+    // "matlab.mlintpath": "/home/gzy/MATLAB/R2022b/bin/glnxa64/mlint",
+    // "matlab.matlabpath": "/home/gzy/MATLAB/R2022b/bin/matlab",
+    "matlab.linterEncoding": "utf8",
     "[matlab]": {
-        "files.encoding": "gb2312",
+        "files.encoding": "utf8",
         "files.autoGuessEncoding": false,
     },
     "files.associations": {
