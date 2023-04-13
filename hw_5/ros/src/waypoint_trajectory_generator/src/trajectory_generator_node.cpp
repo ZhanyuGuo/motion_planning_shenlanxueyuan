@@ -17,6 +17,7 @@
 
 // Useful customized headers
 #include "trajectory_generator_waypoint.h"
+#include <OsqpEigen/OsqpEigen.h>
 
 using namespace std;
 using namespace Eigen;
@@ -25,6 +26,7 @@ using namespace Eigen;
 double _vis_traj_width;
 double _Vel, _Acc;
 int _dev_order, _min_order;
+OsqpEigen::Solver solver;
 
 // ros related
 ros::Subscriber _way_pts_sub;
@@ -84,12 +86,16 @@ void trajGeneration(Eigen::MatrixXd path)
     _polyTime = timeAllocation(path);
 
     // generate a minimum-snap piecewise monomial polynomial-based trajectory
-    _polyCoeff = trajectoryGeneratorWaypoint.PolyQPGeneration(_dev_order, path, vel, acc, _polyTime);
+    // closed form
+    // _polyCoeff = trajectoryGeneratorWaypoint.PolyQPGeneration(_dev_order, path, vel, acc, _polyTime);
+
+    // osqp
+    _polyCoeff = trajectoryGeneratorWaypoint.PolyQPGeneration(_dev_order, path, vel, acc, _polyTime, solver);
 
     visWayPointPath(path);
 
     // After you finish your homework, you can use the function visWayPointTraj below to visulize your trajectory
-    visWayPointTraj( _polyCoeff, _polyTime);
+    visWayPointTraj(_polyCoeff, _polyTime);
 }
 
 VectorXd timeAllocation(MatrixXd Path)

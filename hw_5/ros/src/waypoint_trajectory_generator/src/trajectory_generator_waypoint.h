@@ -3,6 +3,7 @@
 
 #include <Eigen/Eigen>
 #include <vector>
+#include <OsqpEigen/OsqpEigen.h>
 
 class TrajectoryGeneratorWaypoint
 {
@@ -22,7 +23,33 @@ public:
         const Eigen::MatrixXd &Acc,
         const Eigen::VectorXd &Time);
 
+    Eigen::MatrixXd PolyQPGeneration(
+        const int d_order,
+        const Eigen::MatrixXd &Path,
+        const Eigen::MatrixXd &Vel,
+        const Eigen::MatrixXd &Acc,
+        const Eigen::VectorXd &Time,
+        OsqpEigen::Solver &solver);
+
     int Factorial(int x);
+
+    void GetHessian(const int n_seg,
+                    const int d_order,
+                    const Eigen::VectorXd &Time,
+                    Eigen::SparseMatrix<double> &hession);
+
+    void InsertCoff(const int row,
+                    const int col,
+                    Eigen::SparseMatrix<double> &linearMatrix,
+                    const double t,
+                    const int d_order,
+                    bool one_line,
+                    bool reverse);
+
+    void GetLinearConstraintsMatrix(const int n_seg,
+                                    const int d_order,
+                                    const Eigen::VectorXd &Time,
+                                    Eigen::SparseMatrix<double> &linearMatrix);
 };
 
 #endif

@@ -15,6 +15,11 @@
     },
     "files.associations": {
         "*.m": "matlab",
-        "core": "cpp"
+        "core": "cpp",
+        "array": "cpp",
+        "string": "cpp",
+        "string_view": "cpp",
+        "*.tpp": "cpp",
+        "ostream": "cpp"
     }
 }

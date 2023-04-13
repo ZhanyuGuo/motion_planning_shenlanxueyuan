@@ -22,6 +22,109 @@ int TrajectoryGeneratorWaypoint::Factorial(int x)
     return fac;
 }
 
+void TrajectoryGeneratorWaypoint::GetHessian(const int n_seg,
+                                             const int d_order,
+                                             const Eigen::VectorXd &Time,
+                                             Eigen::SparseMatrix<double> &hession)
+{
+    int p_order = 2 * d_order - 1;
+    int p_num1d = p_order + 1;
+    hession.resize(n_seg * p_num1d, n_seg * p_num1d);
+    hession.setZero();
+
+    for (int k = 0; k < n_seg; ++k)
+    {
+        for (int i = d_order; i < p_num1d; ++i)
+        {
+            for (int j = d_order; j < p_num1d; ++j)
+            {
+                double value = 1.0 * Factorial(i) / Factorial(i - d_order) * Factorial(j) / Factorial(j - d_order) / (i + j - 2 * d_order + 1) * pow(Time(k), i + j - 2 * d_order + 1);
+                hession.insert(k * p_num1d + i, k * p_num1d + j) = value;
+            }
+        }
+    }
+}
+
+void TrajectoryGeneratorWaypoint::InsertCoff(const int row,
+                                             const int col,
+                                             Eigen::SparseMatrix<double> &linearMatrix,
+                                             const double t,
+                                             const int d_order,
+                                             bool one_line,
+                                             bool reverse)
+{
+    int p_num1d = 2 * d_order;
+
+    int flag = d_order;
+    if (one_line)
+        flag = 1;
+
+    Eigen::MatrixXd coff(d_order, p_num1d);
+
+    if (d_order == 4)
+    {
+        coff << 1.0, 1.0 * t, 1.0 * pow(t, 2), 1.0 * pow(t, 3), 1.0 * pow(t, 4), 1.0 * pow(t, 5), 1.0 * pow(t, 6), 1.0 * pow(t, 7),
+            0.0, 1.0, 2.0 * t, 3.0 * pow(t, 2), 4.0 * pow(t, 3), 5.0 * pow(t, 4), 6.0 * pow(t, 5), 7.0 * pow(t, 6),
+            0.0, 0.0, 2.0, 6.0 * t, 12.0 * pow(t, 2), 20.0 * pow(t, 3), 30.0 * pow(t, 4), 42.0 * pow(t, 5),
+            0.0, 0.0, 0.0, 6.0, 24.0 * t, 60.0 * pow(t, 2), 120.0 * pow(t, 3), 210.0 * pow(t, 4);
+    }
+    else if (d_order == 3)
+    {
+        coff << 1.0, 1.0 * t, 1.0 * pow(t, 2), 1.0 * pow(t, 3), 1.0 * pow(t, 4), 1.0 * pow(t, 5),
+            0.0, 1.0, 2.0 * t, 3.0 * pow(t, 2), 4.0 * pow(t, 3), 5.0 * pow(t, 4),
+            0.0, 0.0, 2.0, 6.0 * t, 12.0 * pow(t, 2), 20.0 * pow(t, 3);
+    }
+    else
+    {
+        ROS_ERROR("Only d_order = 3 or 4 supported!");
+    }
+
+    if (reverse)
+        coff = coff * (-1.0);
+
+    for (int i = 0; i < d_order && i < flag; ++i)
+    {
+        for (int j = 0; j < p_num1d; ++j)
+        {
+            linearMatrix.insert(row + i, col + j) = coff(i, j);
+        }
+    }
+}
+
+void TrajectoryGeneratorWaypoint::GetLinearConstraintsMatrix(const int n_seg,
+                                                             const int d_order,
+                                                             const Eigen::VectorXd &Time,
+                                                             Eigen::SparseMatrix<double> &linearMatrix)
+{
+    int p_order = 2 * d_order - 1;
+    int p_num1d = p_order + 1;
+    linearMatrix.resize(2 * d_order + (n_seg - 1) * (d_order + 1), p_num1d * n_seg);
+
+    // start and end condition
+    int row = 0, col = 0;
+    InsertCoff(row, col, linearMatrix, 0, d_order, false, false);
+
+    row += d_order;
+    col = (n_seg - 1) * p_num1d;
+    InsertCoff(row, col, linearMatrix, Time(n_seg - 1), d_order, false, false);
+
+    // waypoint positions
+    row += d_order;
+    for (int k = 0; k < n_seg - 1; k++)
+    {
+        InsertCoff(row + k, k * p_num1d, linearMatrix, Time(k), d_order, true, false);
+    }
+
+    // continuty
+    row += n_seg - 1;
+    for (int k = 0; k < n_seg - 1; k++)
+    {
+        InsertCoff(row, k * p_num1d, linearMatrix, Time(k), d_order, false, false);
+        InsertCoff(row, (k + 1) * p_num1d, linearMatrix, 0, d_order, false, true);
+        row += d_order;
+    }
+}
+
 /**
  *  STEP 2: Learn the "Closed-form solution to minimum snap" in L5, then finish this PolyQPGeneration function
  */
@@ -208,6 +311,104 @@ Eigen::MatrixXd TrajectoryGeneratorWaypoint::PolyQPGeneration(
             PolyCoeff.block(k, dim * p_num1d, 1, p_num1d) = poly_coef_1d_t.block(0, k * p_num1d, 1, p_num1d);
         }
     }
+
+    return PolyCoeff;
+}
+
+Eigen::MatrixXd TrajectoryGeneratorWaypoint::PolyQPGeneration(
+    const int d_order,           // the order of derivative
+    const Eigen::MatrixXd &Path, // waypoints coordinates (3d)
+    const Eigen::MatrixXd &Vel,  // boundary velocity
+    const Eigen::MatrixXd &Acc,  // boundary acceleration
+    const Eigen::VectorXd &Time, // time allocation in each segment
+    OsqpEigen::Solver &solver)
+{
+    // enforce initial and final velocity and accleration, for higher order derivatives, just assume them be 0;
+    int p_order = 2 * d_order - 1; // the order of polynomial
+    int p_num1d = p_order + 1;     // the number of variables in each segment
+
+    int m = Time.size();                                 // the number of segments
+    MatrixXd PolyCoeff = MatrixXd::Zero(m, 3 * p_num1d); // position(x,y,z), so we need (3 * p_num1d) coefficients
+    VectorXd Px(p_num1d * m), Py(p_num1d * m), Pz(p_num1d * m);
+
+    // set number of values and constraints
+    solver.data()->setNumberOfVariables(m * p_num1d);
+    solver.data()->setNumberOfConstraints(2 * d_order + (m - 1) * (d_order + 1));
+
+    // set Hession
+    Eigen::SparseMatrix<double> hessian;
+    GetHessian(m, d_order, Time, hessian);
+    if (!solver.data()->setHessianMatrix(hessian))
+    {
+        ROS_ERROR("failed to set Hessian");
+        return PolyCoeff;
+    }
+
+    // set linear constraints
+    Eigen::SparseMatrix<double> linearMatrix;
+    GetLinearConstraintsMatrix(m, d_order, Time, linearMatrix);
+    if (!solver.data()->setLinearConstraintsMatrix(linearMatrix))
+    {
+        ROS_ERROR("failed to set linearMatrix");
+        return PolyCoeff;
+    }
+
+    // set gradient
+    Eigen::VectorXd gradient(p_num1d * m);
+    gradient.setZero();
+    if (!solver.data()->setGradient(gradient))
+    {
+        ROS_ERROR("failed to set gradient");
+        return PolyCoeff;
+    }
+
+    // boundary
+    Eigen::VectorXd lowbound = VectorXd::Zero(2 * d_order + (m - 1) * (d_order + 1));
+    Eigen::VectorXd upbound = VectorXd::Zero(2 * d_order + (m - 1) * (d_order + 1));
+
+    solver.data()->setLowerBound(lowbound);
+    solver.data()->setUpperBound(upbound);
+
+    if (!solver.isInitialized())
+    {
+        solver.initSolver();
+    }
+
+    for (int dim = 0; dim < 3; dim++)
+    {
+        VectorXd wayPoints = Path.col(dim);
+
+        // start condition
+        lowbound(0) = wayPoints(0);
+        upbound(0) = wayPoints(0);
+
+        // end condition
+        lowbound(d_order) = wayPoints(m);
+        upbound(d_order) = wayPoints(m);
+
+        // waypoint position
+        for (int i = 0; i < m - 1; i++)
+        {
+            lowbound(2 * d_order + i) = wayPoints(i + 1);
+            upbound(2 * d_order + i) = wayPoints(i + 1);
+        }
+
+        solver.updateBounds(lowbound, upbound);
+        solver.solveProblem();
+        Eigen::VectorXd poly_coef_1d = solver.getSolution();
+        MatrixXd poly_coef_1d_t = poly_coef_1d.transpose();
+
+        for (int k = 0; k < m; k++)
+        {
+            PolyCoeff.block(k, dim * p_num1d, 1, p_num1d) = poly_coef_1d_t.block(0, k * p_num1d, 1, p_num1d);
+        }
+    }
+
+    // reset
+    solver.data()->clearHessianMatrix();
+    solver.data()->clearLinearConstraintsMatrix();
+    solver.clearSolverVariables();
+    solver.clearSolver();
 
     return PolyCoeff;
 }
