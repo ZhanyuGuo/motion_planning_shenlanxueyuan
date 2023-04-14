@@ -27,9 +27,12 @@ end
 % NOTE: currently time duration for each Bezier curve only supports [0, 1], ts is not used...
 ts = zeros(n_seg, 1);
 
-% for k = 1:n_seg
-%     ts(k, 1) = 0.1;
-% end
+for k = 1:n_seg
+    ts(k, 1) = 1;
+    % ts(k, 1) = sqrt(k);
+    % ts(k, 1) = k;
+    % ts(k, 1) = k ^ 2;
+end
 
 poly_coef_x = MinimumSnapCorridorBezierSolver(1, path(:, 1), corridor, ts, n_seg, n_order, v_max, a_max);
 poly_coef_y = MinimumSnapCorridorBezierSolver(2, path(:, 2), corridor, ts, n_seg, n_order, v_max, a_max);
@@ -56,8 +59,8 @@ for k = 0:n_seg - 1
 
         for i = 0:n_order
             basis_p = nchoosek(n_order, i) * t ^ i * (1 - t) ^ (n_order - i);
-            x_pos(idx) = x_pos(idx) + poly_coef_x(k * n_poly_perseg + i + 1) * basis_p;
-            y_pos(idx) = y_pos(idx) + poly_coef_y(k * n_poly_perseg + i + 1) * basis_p;
+            x_pos(idx) = x_pos(idx) + poly_coef_x(k * n_poly_perseg + i + 1) * basis_p * ts(k + 1);
+            y_pos(idx) = y_pos(idx) + poly_coef_y(k * n_poly_perseg + i + 1) * basis_p * ts(k + 1);
         end
 
         idx = idx + 1;
@@ -66,7 +69,7 @@ for k = 0:n_seg - 1
 end
 
 for k = 0:n_seg - 1
-    scatter(poly_coef_x(n_poly_perseg * k + 1:n_poly_perseg * (k + 1)), poly_coef_y(n_poly_perseg * k + 1:n_poly_perseg * (k + 1)), 100, color(k + 1));
+    scatter(ts(k + 1) * poly_coef_x(n_poly_perseg * k + 1:n_poly_perseg * (k + 1)), ts(k + 1) * poly_coef_y(n_poly_perseg * k + 1:n_poly_perseg * (k + 1)), 100, color(k + 1));
 end
 
 plot(x_pos', y_pos', "Linewidth", 2.0, "color", "k");

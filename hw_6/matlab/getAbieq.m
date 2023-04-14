@@ -6,6 +6,11 @@ function [Aieq, bieq] = getAbieq(n_seg, n_order, corridor_range, ts, v_max, a_ma
     %   STEP 3.2.1 p constraint
     % ###########################
     v = ones(n_all_poly, 1);
+
+    for k = 0:n_seg - 1
+        v(n_poly_perseg * k + 1:n_poly_perseg * (k + 1)) = v(n_poly_perseg * k + 1:n_poly_perseg * (k + 1)) * ts(k + 1);
+    end
+
     Aieq_p = diag(v);
     bieq_p = zeros(n_all_poly, 1);
 
@@ -47,9 +52,9 @@ function [Aieq, bieq] = getAbieq(n_seg, n_order, corridor_range, ts, v_max, a_ma
     j = 1;
 
     for i = 1:(n_order - 1) * n_seg
-        Aieq_a(i, j:j + 2) = n_order * (n_order - 1) * [1, -2, 1];
+        Aieq_a(i, j:j + 2) = n_order * (n_order - 1) * [1, -2, 1] / ts(floor(j / n_poly_perseg) + 1);
 
-        if mod(j + 2, n_order + 1) == 0
+        if mod(j + 2, n_poly_perseg) == 0
             j = j + 3;
         else
             j = j + 1;

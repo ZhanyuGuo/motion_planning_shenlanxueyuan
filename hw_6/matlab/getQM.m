@@ -11,11 +11,12 @@ function [Q, M] = getQM(n_seg, n_order, ts)
         % ##############################################
         Q_k = zeros(n_poly_perseg, n_poly_perseg);
         t_k = 1;
+        s_k = ts(k);
 
         for i = 4:n_order
 
             for j = 4:n_order
-                Q_k(i + 1, j + 1) = factorial(i) / factorial(i - d_order) * factorial(j) / factorial(j - d_order) / (i + j - n_order) * t_k ^ (i + k - n_order);
+                Q_k(i + 1, j + 1) = factorial(i) / factorial(i - d_order) * factorial(j) / factorial(j - d_order) / (i + j - n_order) * t_k ^ (i + k - n_order) / s_k ^ (2 * d_order - 3);
             end
 
         end
